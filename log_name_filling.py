@@ -1,5 +1,6 @@
 import os
 import keyboard
+from datetime import datetime as dt
 
 class Nomatch(Exception):
     pass
@@ -11,6 +12,7 @@ code = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 fam_name = ''
 init = ''
 date = ''
+EOI = 'Ошибка ввода. '
 
 def letter_encoder(letter, decoding):
     result = str(decoding.find(letter) + 1)
@@ -22,7 +24,7 @@ def exc_check(queue, code):
     e = 0
     for lett in queue:
         if not lett.lower() in code:
-            print('Ошибка ввода. Недопустимый символ: "{0:s}"'.format(lett))
+            print(EOI + 'Недопустимый символ: "{0:s}"'.format(lett))
             e += 1
     if e != 0:
         raise Nomatch
@@ -30,7 +32,7 @@ def exc_check(queue, code):
 while True:
     fam_name = input('Введите ТРИ первых буквы фамилии испытуемого: \n')
     if len(fam_name) != 3:
-        print('Ошибка ввода. Требуются ТРИ первых буквы фамилии испытуемого.')
+        print(EOI + 'Требуются ТРИ первых буквы фамилии испытуемого.')
         continue
     try:
         exc_check(fam_name, code)
@@ -41,7 +43,7 @@ while True:
 while True:
     init = input('Введите ИО (инициалы) испытуемого без пробелов и точек: \n')
     if len(init) != 2:
-        print('Ошибка ввода. Требуются ДВЕ буквы (Имя, Отчество).')
+        print(EOI + 'Требуются ДВЕ буквы (Имя, Отчество).')
         continue
     try:
         exc_check(init, code)
@@ -51,22 +53,22 @@ while True:
 
 while True:
     try:
-        date = input('Ведите день и месяц рождения испытуемого в формате ддмм: \n')
+        date = input('Введите день и месяц рождения испытуемого в формате ддмм: \n')
         temp = int(date)
         if len(date) != 4:
             raise LenNoMatch
     except ValueError:
-        print('Ошибка ввода. Введите целое четырёхзначное ЧИСЛО без пробелов и точек.')
+        print(EOI + 'Введите целое четырёхзначное ЧИСЛО без пробелов и точек.')
         continue
     except LenNoMatch:
-        print('Ошибка ввода. Требуется ЧЕТЫРЕ цифры без пробелов и точек.')
+        print(EOI + 'Требуется ЧЕТЫРЕ цифры без пробелов и точек.')
         continue
-    else:
+    else: # Изёвая проверка корректности даты. Можно строже.
         if int(date[0:2]) < 1 or int(date[0:2]) > 31:
-            print('Ошибка ввода. День месяца должен быть в диапазоне [1, 31]')
+            print(EOI + 'Число месяца должо быть в диапазоне [1, 31].')
             continue
         if int(date[2:]) < 1 or int(date[2:]) > 12:
-            print('Ошибка ввода. Месяц должен быть в диапазоне [1, 12]')
+            print(EOI + 'Месяц должен быть в диапазоне [1, 12].')
             continue
     break
 
@@ -79,10 +81,25 @@ print('Вы ввели фамилию: {!r}'.format(fam_name.upper()))
 print('Вы ввели инициалы: {!r}'.format(init.upper()))
 print('Вы ввели дату рождения: {!r}'.format(date))
 print('ID испытуемого согласно скрипту: {:s} \n '.format(encoded_id))
-print('Нажмите пробел для продолжения')
+print('Нажмите пробел для продолжения.')
 keyboard.wait('space')
+print('\n')
+visit = 0
+
+while True:
+    try:
+        visit = int(input('Введите номер визита (от 1 до 3): \n'))
+        if visit < 1 or visit > 3:
+            print(EOI + 'Номер визита должен быть в диапазоне [1, 3]')
+            continue
+    except ValueError:
+        print(EOI + 'Введите ЧИСЛО от 1 до 3.')
+        continue
+    break
+
+start_time = dt.today()
 
 os.chdir('C:/Users/Kirill/Desktop/Flanker_task/Logs/name_gen')
 with open('name_list.log', 'a', encoding='utf-8') as f:
-    f.write('\n' + encoded_id)
+    f.write('\n' + encoded_id + '\t' + str(visit) + '\t' + start_time.strftime("%d_%m_%Y\t%H_%M_%S"))
 os.system('C:/Users/Kirill/Desktop/Flanker_task/Flanker_task.exp')
