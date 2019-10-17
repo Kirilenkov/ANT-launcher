@@ -8,7 +8,7 @@ class Nomatch(Exception):
 class LenNoMatch(Nomatch):
     pass
 
-code = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
+key = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 fam_name = ''
 init = ''
 date = ''
@@ -20,10 +20,10 @@ def letter_encoder(letter, decoding):
         result = '0' + result
     return result
 
-def exc_check(queue, code):
+def exc_check(queue, key):
     e = 0
     for lett in queue:
-        if not lett.lower() in code:
+        if not lett.lower() in key:
             print(EOI + 'Недопустимый символ: "{0:s}"'.format(lett))
             e += 1
     if e != 0:
@@ -35,7 +35,7 @@ while True:
         print(EOI + 'Требуются ТРИ первых буквы фамилии испытуемого.')
         continue
     try:
-        exc_check(fam_name, code)
+        exc_check(fam_name, key)
     except Nomatch:
         continue
     break
@@ -46,7 +46,7 @@ while True:
         print(EOI + 'Требуются ДВЕ буквы (Имя, Отчество).')
         continue
     try:
-        exc_check(init, code)
+        exc_check(init, key)
     except Nomatch:
         continue
     break
@@ -74,7 +74,7 @@ while True:
 
 encoded_id = ''
 for i in fam_name + init:
-    encoded_id += letter_encoder(i, code)
+    encoded_id += letter_encoder(i, key)
 encoded_id += date + '0' # Обсудить механизм для оценки последнего значения.
 
 print('Вы ввели фамилию: {!r}'.format(fam_name.upper()))
